@@ -1,0 +1,104 @@
+---
+
+- hosts: proxmox
+  gather_facts: false
+ 
+  vars_prompt:
+  - name: "vmname"
+    prompt: "VM name?: "
+    private: no
+  - name: "newid"
+    prompt: "ID de la Nouvelle Machine :"
+    private: no
+  - name: "vm_id"
+    prompt: "ID de la machine a Cloner ? : "
+    default: "9000"
+    private: no
+  # - name: "args_template"
+  #   prompt: "args template?: "
+  #   default: "files/args-ubuntu-docker.yml"
+  #   private: no
+  # - name: "kernel"
+  #   prompt: "kernel?: "
+  #   default: "http://deploy.example.com/preseed/linux"
+  #   private: no
+  # - name: "initrd"
+  #   prompt: "initrd?: "
+  #   default: "http://deploy.example.com/preseed/initrd.gz"
+  #   private: no
+  - name: "api_host"
+    prompt: "PVE API host?: "
+    default: "192.168.1.254"
+    private: no
+  - name: "node"
+    prompt: "PVE target node?: "
+    default: "pve01"
+    private: no
+  - name: "api_user"
+    prompt: "PVE API user?: "
+    default: "root@pam"
+    private: no
+  - name: "api_password"
+    prompt: "PVE API password?: "
+    default: "123Qwerty"
+    private: yes
+  
+  - name: "nb_core"
+    prompt: "Nombre de Core : "
+    default: "2"
+    private: no  
+  - name: "nb_memory"
+    prompt: "Nombre de Ram : "
+    default: "8192"
+    private: no  
+  - name: "nb_balloon"
+    prompt: "Nombre Ram Baloon : "
+    default: "512"
+    private: no
+
+  tasks:
+  - name: Clone VM
+    community.general.proxmox_kvm:
+      api_user    : root@pam
+      api_password: 123Qwerty
+      api_host    : "{{ api_host }}"
+      clone       : VM 9000   # The VM source
+      name        : "{{ vmname }}"  # The target VM name
+      vmid        : "{{ vm_id }}"
+      node        : "{{ node }}"
+      newid       : "{{ newid }}"
+      #format      : qcow2
+
+  # - name: Create KVM
+  #   proxmox:
+  #     api_user: "{{ api_user }}"
+  #     api_password: "{{ api_password }}"
+  #     password: "{{ api_password }}"
+  #     api_host: "{{ api_host }}"
+  #     node: "{{ node }}"
+  #     vmid: "{{ vm_id }}"
+  #     hostname: "{{ vmname }}"
+  #     #net: '{"net0":"virtio,bridge=vmbr0"}'
+  #     #virtio: '{"virtio0":"rpool-vm:64"}'
+  #     cores: "{{ nb_core }}"
+  #     memory: "{{ nb_memory }}"
+  #     #balloon: "{{ nb_balloon }}"
+  #     #vga: qxl
+  #     #ostype: l26
+  #     #netif: '{"net0":"name=eth0,ip=dhcp,ip6=dhcp,bridge=vmbr0"}'
+  #     storage: local-lvm
+  #     #ostemplate: 'local:vztmpl/Ubuntu-20.10-Template.tar.gz'
+  #     state: present
+
+  - name: Start VM
+    community.general.proxmox_kvm:
+      api_user: "{{ api_user }}"
+      api_password: "{{ api_password }}"
+      api_host: "{{ api_host }}"
+      node: "{{ node }}"
+      name: "{{ vmname }}"
+      vmid: "{{ newid }}"
+      state: started
+      timeout : 15
+
+

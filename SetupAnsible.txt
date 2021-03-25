@@ -1,0 +1,16 @@
+sur le serveur Ansible ont creer un cle SSH
+ssh-keygen -t ecdsa -b 384
+
+on copie la cle sur les serveur a gerer
+
+ssh-copy-id #nomduserveur
+
+(pour proxmox)
+ssh-copy-id root@192.168.1.254
+
+Tester le tout ssh user@hostname ou ip
+
+
+
+ANsible a besoins de 
+ansible-galaxy collection install community.general

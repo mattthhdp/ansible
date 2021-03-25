@@ -1,0 +1,53 @@
+- hosts: ubuntu
+  become: true
+  tasks:
+    - name: apt update les repot sur mes serveurs
+      apt: update_cache=yes force_apt_get=yes 
+
+    - name: Installation des Dependence de Docker
+      apt:
+        name: "{{item}}"
+        state: present
+      loop:
+        - apt-transport-https
+        - ca-certificates
+        - curl
+        - gnupg-agent
+        - software-properties-common
+        - linux-generic
+        - cifs-utils
+
+    - name: Ajout GPG key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Ajout du repository Docker (stable) Ubuntu Host
+      ansible.builtin.apt_repository:
+        repo: deb https://download.docker.com/linux/ubuntu bionic stable
+        state: present
+      when: ansible_architecture == "x86_64"
+
+    - name: Ajout du repository Docker (stable) ARM Host
+      ansible.builtin.apt_repository:
+        repo: deb https://download.docker.com/linux/ubuntu bionic stable
+        state: present
+      when: ansible_architecture == "arm64"
+
+    - name: apt update les repot apres avoir ajoute docker
+      apt: update_cache=yes force_apt_get=yes
+
+    - name: Installation de Docker
+      apt:
+        name: "{{item}}"
+        state: present
+      loop:
+        - docker-ce
+        - docker-ce-cli
+        - containerd.io
+
+    - name: Docker actif et fonctionelle ?
+      service:
+        name: docker
+        state: started
+        enabled: yes

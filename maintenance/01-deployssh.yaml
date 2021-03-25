@@ -1,0 +1,50 @@
+---
+ - hosts: ubuntu
+   become: true
+   vars:
+     - ansible_user: 'jaune'
+     - ansible_password: '$6$qTDGDXIFs16x$tt6wZnhybqdG0.2e2hMx0hVpvT8aE7rqYbZWbh9PNS98.qCSrG0XOl7FkfC1.kx8R8T6YqQkw6C98dIOAjdmt1'
+   gather_facts: no
+   tasks:
+ 
+   - name: Ajouter user USER et password
+     user:
+          name={{ ansible_user }}
+          password={{ ansible_password }}
+
+   - name: Ajoute USER au sudo
+     copy:
+          dest: "/etc/sudoers.d/{{ ansible_user}}"
+          content: "{{ ansible_user }}  ALL=(ALL)  NOPASSWD: ALL"
+ 
+   - name: Set SSHKEY
+     authorized_key:
+          user: "{{ ansible_user }}"
+          key: "{{ lookup('file', '/home/{{ ansible_user }}/.ssh/id_ecdsa.pub') }}"
+          state: present
+
+  #  - name: Enlever l'authentification par mot de passe
+  #    lineinfile:
+  #          dest=/etc/ssh/sshd_config
+  #          regexp='^PasswordAuthentication'
+  #          line="PasswordAuthentication no"
+  #          state=present
+  #          backup=yes
+  #    notify:
+  #      - restart ssh
+ 
+   - name: Enlever le ROOT si present
+     lineinfile:
+           dest=/etc/ssh/sshd_config
+           regexp='^PermitRootLogin'
+           line="PermitRootLogin no"
+           state=present
+           backup=yes
+     notify:
+       - restart ssh
+ 
+   handlers:
+   - name: restart ssh
+     service:
+       name=sshd
+       state=restarted

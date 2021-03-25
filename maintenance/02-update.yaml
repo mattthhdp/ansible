@@ -1,0 +1,31 @@
+- hosts: ubuntu
+  become: true
+  gather_facts: True
+  tasks:
+    - name: apt update les repot sur mes serveurs
+      apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
+
+    - name: apt upgrade sur les serveurs
+      apt: upgrade=dist force_apt_get=yes
+
+    - name: install le qemu-guest-agent pour Proxmox
+      apt:
+        name: qemu-guest-agent
+        state: present
+      when: ansible_architecture == "x86_64"
+
+
+    - name: Regarder si un reboot est necessaire sur les serveurs
+      register: reboot_required_file
+      stat: path=/var/run/reboot-required get_md5=no
+
+    - name: Redemarrer si un Kernel update est Disponible
+      reboot:
+        msg: "Reboot fait par Ansible pour mise a jour de Kernel"
+        connect_timeout: 5
+        reboot_timeout: 300
+        pre_reboot_delay: 0
+        post_reboot_delay: 30
+        test_command: uptime
+      when: reboot_required_file.stat.exists
+

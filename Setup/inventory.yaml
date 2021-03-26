@@ -1,0 +1,11 @@
+[proxmox]
+pve01
+pve02
+
+[ubuntu]
+
+Swarm-02
+Swarm-01
+swarm-03
+
+[windows]

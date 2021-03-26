@@ -1,9 +1,0 @@
-[proxmox]
-pve01 ansible_host=192.168.1.254
-
-[ubuntu]
-#192.168.1.63 ansible_python_interpreter=/usr/bin/python3
-Swarm-02
-Swarm-01
-swarm-03
-

@@ -1,0 +1,27 @@
+---
+- name: Installation de jeux
+  hosts: enfants
+  tasks:
+
+#     - name: Url Copy Minecraft
+#       ansible.windows.win_get_url:
+#         url: https://file.jaune.live/#/HOME/Media/Jeux/
+#         dest: 'C:\Jeux'
+#    - name: Copy a single file
+#      ansible.windows.win_copy:
+#        src: '\\data\D\Media\Jeux\Minecraft-tlauncher.exe'
+#        dest: 'C:\Jeux'
+#        remote_src: yes
+#      become: yes
+#      become_method: runas
+#      become_flags: logon_type=new_credential logon_flags=netcredentials_only
+#      vars:
+#        ansible_become_user: kodi
+#        ansible_become_pass: kodi
+#        ansible_remote_tmp: '\\data\D\Media\Jeux\Minecraft-tlauncher.exe' 
+    - name: Install de Steam
+      win_chocolatey:
+        name: '{{ item }}'
+        state: present
+      loop:
+      - Steam

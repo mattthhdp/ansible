@@ -1,0 +1,23 @@
+---
+- name: Installation de Chocolatey
+  hosts: enfants
+  tasks:
+    - name: Ensure Chocolatey itself is installed Sinon ont l'install
+      win_chocolatey:
+        name: chocolatey
+        state: present
+
+    - name: Install de core soft pour windows
+      win_chocolatey:
+        name: '{{ item }}'
+        state: present
+      loop:
+      - chocolatey-core.extension
+      - chocolateygui
+      - 7zip
+      - googlechrome
+      - jre8
+      - vcredist140
+      - vscode
+      - vlc
+

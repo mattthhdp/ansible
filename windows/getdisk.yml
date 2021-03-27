@@ -1,20 +1,28 @@
 ---
-- hosts: win 
+- hosts: enfants 
   tasks: 
+  # - name: test ping
+  #   ansible.windows.win_ping:
+
   - name: Get disk facts
-    win_disk_facts:
+    community.windows.win_disk_facts:
 
   - name: Output first disk size
-    debug:
-      var: ansible_facts.disks[0].size
-
-  - name: Convert first system disk into various formats
-    debug:
-      msg: '{{ disksize_gib }} vs {{ disksize_gib_human }}'
+    debug:    
+      msg: 'Disk : {{ diskk.friendly_name }} 
+            Remain: {{ disksizeremain_gb_human }} | {{ disksize_gb_human }} '
     vars:
       # Get first system disk
-      disk: '{{ ansible_facts.disks|selectattr("system_disk")|first }}'
+      diskk: '{{ ansible_facts.disks|selectattr("system_disk")|first }}'
+      # Show disk size in Gigabytes
+      disksize_gb_human: '{{ disk.1.size|filesizeformat }}'   # returns "240.1 GB" (human readable)
+      disksizeremain_gb_human: '{{ansible_facts.disks[0].partitions[0].volumes[0].size_remaining|filesizeformat }}'   # returns "240.1 GB" (human readable)
 
-      # Show disk size in Gibibytes
-      disksize_gib_human: '{{ disk.size|filesizeformat(true) }}' 
-      disksize_gib: '{{ (disk.size/1024|pow(3))|round|int }} GiB'
+    with_subelements:
+      - "{{ ansible_disks }}"
+      - partitions
+    loop_control:
+      loop_var: disk
+    when:
+      - disk.1.drive_letter
+

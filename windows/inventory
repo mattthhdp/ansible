@@ -1,7 +1,0 @@
-[master]
-sunshine
-
-[enfants]
-alexis ansible_user=jaune ansible_pass=123Qwerty!
-samuel ansible_user=jaune ansible_pass=123Qwerty!
-
